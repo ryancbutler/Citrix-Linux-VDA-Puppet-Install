@@ -1,0 +1,13 @@
+#Citrix DDC multiple servers seperate by space
+ctx_rhel_vda_install::ddc: 'ddc.domain.local'
+
+#Domain admin user to add server to domain
+samba::rhel::adminuser: 'iamadmin'
+#Password to add to domain
+samba::rhel::adminpassword: 'MYPASSWORD'
+#domain controller to add to domain. MAKE SURE TO CAPS
+samba::rhel::domain_controller: 'DC01.DOMAIN.LOCAL'
+#FQ domain name. MAKE SURE TO CAPS 
+samba::rhel::active_directory_realm: 'DOMAIN.LOCAL'
+#Domain name.  MAKE SURE TO CAPS
+samba::rhel::domainworkgroup: 'DOMAIN'

@@ -1,0 +1,9 @@
+#!/bin/bash
+export CTX_XDL_SUPPORT_DDC_AS_CNAME=Y
+export CTX_XDL_DDC_LIST=<%= @ddc %>
+export CTX_XDL_REGISTER_SERVICE=Y
+export CTX_XDL_ADD_FIREWALL_RULES=Y
+export CTX_XDL_AD_INTEGRATION=1
+export CTX_XDL_USER_FORMAT=2
+export CTX_XDL_START_SERVICE=Y
+/usr/local/sbin/ctxsetup.sh
