@@ -22,3 +22,4 @@ The following requirements are required for a successful deployment.
 4. DNS entry for deployed VM should already be created
 5. If Hiera is unavailable edit required variables in the **samba** and **ctx_vda_install** init.pp manifests.  Make sure to comment out hiera variables and uncomment non-hiera.  If hiera is available see `common.yaml` for variable syntax.
 6. Download [citrix-linuxvda-rhel-1.0.0.tgz](http://www.citrix.com/downloads/xendesktop/components/linux-virtual-desktop-10.html#ctx-dl-eula) from Citrix and extract **XenDesktopVDA-1.0.0.161-0.x86_64.rpm** into **Files** directory
+7. Assumes machine has desktop packages already installed
