@@ -6,10 +6,19 @@ class ctx_vda::ctxvda_packages {
 	#JAVA
 	$javapackages = ['java-1.7.0-openjdk','java-1.7.0-openjdk-devel']
 
-	#required version for VDA to work
+	#OS Version Differences
+	if $operatingsystemmajrelease == '6' {
+	$oddballs = ['redhat-lsb-core','ImageMagick','policycoreutils-python','libXpm','openmotif']
+	$postgresinit = '/sbin/service postgresql initdb'
+	}
+	elsif $operatingsystemmajrelease == '7' {
+	$oddballs = ['redhat-lsb-core','ImageMagick','policycoreutils-python','libXpm','motif']
+	$postgresinit = 'postgresql-setup initdb'
+	}
+	
+
 	package { $javapackages:
-		ensure  => '1.7.0.79-2.5.5.4.el6',
-		#ensure  => 'present',
+		ensure  => 'present',
 	  }
 
 	#This breaks the VDA from connecting
@@ -29,7 +38,7 @@ class ctx_vda::ctxvda_packages {
 	  exec { 'initpostgres':
 		path      => '/bin:/sbin:/usr/sbin:/usr/bin/',
 		creates => '/var/lib/pgsql/data/PG_VERSION',
-		command   => "/sbin/service postgresql initdb",
+		command   => $postgresinit,
 		user      => 'root',
 		group     => 'root',
 		logoutput => true,
@@ -46,8 +55,6 @@ class ctx_vda::ctxvda_packages {
 		}
 
 	 #remaining packages needed for VDA install
-	 
-	 $oddballs = ['redhat-lsb-core','ImageMagick','policycoreutils-python','libXpm','openmotif']
 	 package { $oddballs:
 		ensure => 'latest',
 		}
