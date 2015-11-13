@@ -1,5 +1,5 @@
 # Citrix Linux VDA Puppet Install
-Fully automates install and configuration of Citrix Linux VDA from template VM.
+Fully automates install and configuration of Citrix Linux VDA from template VM. Basically follows this guide http://blogs.citrix.com/2015/08/25/installing-the-linux-vda-on-red-hat-or-centos-6/
 
 ## RHEL\CentOS 
 1. Installs all required repo packages
