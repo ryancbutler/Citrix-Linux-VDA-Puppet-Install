@@ -8,19 +8,32 @@ class ctx_vda::ctx_vda_install {
 
 	#Variables from HIERA
 	$ddc = hiera('ctx_rhel_vda_install::ddc')
+	
+	#OS Version Differences
+	#Current VDA version
+	if $operatingsystemmajrelease == '6' {
+	$rpmvda = "XenDesktopVDA6-1.1.0.240-0.x86_64.rpm"
+	}
+	elsif $operatingsystemmajrelease == '7' {
+	$rpmvda = "XenDesktopVDA7-1.1.0.240-0.x86_64.rpm"
+	}
+	
+	#notify { "${module_name}_exceptionVER" : 
+    #message  => "${rpmvda} is being installed",
+    #}
 
 	#Downloads Citrix Linux VDA RPM
 	file {'downloadrpm':
-		path => '/tmp/XenDesktopVDA-1.0.0.161-0.x86_64.rpm',
+		path => '/tmp/${rpmvda}',
 		ensure => present,
-		source => "puppet:///modules/${module_name}/XenDesktopVDA-1.0.0.161-0.x86_64.rpm",
+		source => "puppet:///modules/${module_name}/${rpmvda}",
 		}
 
 	#Installs Citrix Linux VDA RPM
-	package { 'XenDesktopVDA-1.0.0.161-0.x86_64':
+	package { 'XenDesktopVDA':
 	  ensure   => installed, 
 	  provider => 'rpm',
-	  source   => 'file:///tmp/XenDesktopVDA-1.0.0.161-0.x86_64.rpm',
+	  source   => 'file:///tmp/${rpmvda}',
 	  require => File['downloadrpm'],
 	}
 
@@ -45,14 +58,14 @@ class ctx_vda::ctx_vda_install {
 	}	
 
 	#Configures Citrix VDA service
-	 exec { "configvda":
+	 exec { 'configvda':
 		path      => '/bin:/sbin:/usr/sbin:/usr/bin/',
-		command   => "/tmp/configvda.sh",
-		unless    => "service ctxvda status",
+		command   => '/tmp/configvda.sh',
+		unless    => 'service ctxvda status',
 		user      => 'root',
 		group     => 'root',
 		logoutput => true,
-		require    => [ Package['XenDesktopVDA-1.0.0.161-0.x86_64'], File['downloadconfvda'] ],
+		require    => [ Package['XenDesktopVDA'], File['downloadconfvda'] ],
 		notify => Service['ctxvda'],
 	  }
 	 } 

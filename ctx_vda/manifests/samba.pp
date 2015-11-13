@@ -26,7 +26,8 @@ class rhel {
   package { $packagelist:
     ensure  => 'latest',
   }
-
+ 
+ 
   file { '/etc/security/pam_winbind.conf':
     ensure  => 'file',
     owner   => 'root',
@@ -45,6 +46,7 @@ class rhel {
     hasstatus  => true,
   }
 
+
   service { 'winbind':
     ensure     => 'running',
     enable     => true,
@@ -53,6 +55,7 @@ class rhel {
     require    => File['smbconf'],
   }
 
+	
   file { 'smbconf':
     path => '/etc/samba/smb.conf',
 	ensure  => 'present',
@@ -60,43 +63,47 @@ class rhel {
     group   => 'root',
     mode    => '0644',
     require => Package['samba-winbind'],
-	content => template("${module_name}/smb.conf.erb"),
+	content => template("${module_name}/smb.conf${operatingsystemmajrelease}.erb"),
     notify  => Service['winbind'],
 	replace => false,
   }
   
 
-  exec { "configurewinbind":
+exec { "configurewinbind":
 	path      => '/bin:/sbin:/usr/sbin:/usr/bin/',
     unless    => 'net ads testjoin',
     command   => "authconfig \
 --disablecache \
+--disablesssd \
+--disablesssdauth \
 --enablewinbind \
 --enablewinbindauth \
+--disablewinbindoffline \
 --smbsecurity=ads \
 --smbworkgroup=${domainworkgroup} \
 --smbrealm=${active_directory_realm} \
 --winbindtemplatehomedir=/home/%D/%U \
 --winbindtemplateshell=/bin/bash \
---enablekrb5 \
 --krb5realm=${active_directory_realm} \
 --krb5kdc=${domain_controller} \
 --krb5adminserver=${domain_controller} \
---enablekrb5kdcdns \
---enablekrb5realmdns \
 --enablelocauthorize \
 --enablemkhomedir \
---enablepamaccess \
---updateall",
+--update",
     user      => 'root',
     group     => 'root',
     logoutput => true,
     notify    => Service[winbind],
   }
 
-  
-  # Try joining to the domain if it's not correctly showing it's joined
-  exec { "join-AD-domain":
+
+#ugly workaround for authconfig created line for CentOS 7
+file_line { 'authconfig_fix':
+  path => '/etc/samba/smb.conf',  
+  line => '   kerberos method = secrets and keytab',
+  match => '^\s*kerberos method = secrets only*$',
+  } ~> 
+ exec { "join-AD-domain": # Try joining to the domain if it's not correctly showing it's joined
     path      => '/bin:/sbin:/usr/sbin:/usr/bin/',
     unless    => 'net ads testjoin',
     command   => "net ads join -U ${adminuser}%${adminpassword} -S ${domain_controller}",

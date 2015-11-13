@@ -1,6 +1,7 @@
 class ctx_vda::disable_networkproxy {
 
 	class rhel {
+	if $operatingsystemmajrelease == '6' {
 	#Creates needed directory if not there
 	file { '30-site.d':
 		path => '/etc/polkit-1/localauthority/30-site.d',
@@ -18,4 +19,5 @@ class ctx_vda::disable_networkproxy {
 		require => File['30-site.d'],
 	  }
 	  }
+	 }
  }
